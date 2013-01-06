@@ -1,0 +1,17 @@
+# Base annotation types for coreference. Note that only atomic types are
+# supported here.
+# However, expressions of the form Annotation.feature == value can be
+# specified at run-time
+
+basePersonType = 	Person
+baseLocationType = 	Location
+baseOrganizationType = 	Organization
+baseOtherType = 	Unknown
+baseJobTitleType = 	JobTitle
+baseTitleType = 	Title
+baseSortalType =		Thing
+baseDiseaseSortalType = 	Disease
+baseProcedureSortalType = 	Procedure
+baseTestSortalType = 		Test
+baseSymptomSortalType = 	Symptom
+quotedTextType = 		QuotedText

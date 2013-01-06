@@ -1,0 +1,5 @@
+<CREOLE-DIRECTORY ID="org.philgooch.PronounAnnotator" VERSION="0.51" GATE-MIN="6.1" DESCRIPTION="Annotates English pronouns according to anaphoricity or pleonasticity, case, person, gender, number, and class, and performs pronominal coreference.">
+  <CREOLE>
+      <JAR SCAN="true">PronounAnnotator.jar</JAR>
+  </CREOLE>
+</CREOLE-DIRECTORY>

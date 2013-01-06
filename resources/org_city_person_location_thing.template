@@ -1,0 +1,362 @@
+/*
+*  
+* Filename: 		org_city_person_location_thing.jape
+* Author:			Phil Gooch
+* Copyright:		Phil Gooch
+* Description:		Annotates definite descriptors
+*				
+*
+* Date created:		03/04/2012
+* This version:		0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date				Version		Author			Description
+* ==========================================================================
+* 03/04/2012		0.1			PG				Created
+* 04/04/2012		0.2			PG				Bring the possessive/DT into the definite descriptor annotation.
+*												Some disambiguation for anonymous definite descriptors.
+*												Added support for Organization
+* 05/04/2012		0.3			PG				Generic public person types (public, government etc)
+*/
+
+
+Phase:	PossessivePerson
+Input:  Token Split Day Date Time ${PRONOUN} ${PERSON} ${JOBTITLE} ${LOCATION} ${ORGANIZATION} ${TITLE} ${SORTAL} ${DISEASE} ${PROCEDURE} ${TEST} ${SYMPTOM}
+Options: control = appelt
+
+
+
+MACRO: THREE_TOKEN_WINDOW
+(
+	({Token.category =~ "^JJ|RB"})?
+	({Token.kind == word})[0, 2]
+)
+
+MACRO: POSSESSIVE
+(
+	{${PRONOUN}.cls == "Person", ${PRONOUN}.case == "possessive"} |
+	( {${PERSON}} {Token.category == POS} ) |
+	{Token.category == DT}
+)
+
+MACRO: GERUND_AS_ADJ
+(
+	({Token.category ==~ "VBD|VBN|VBG", Token.affix ==~ "en|ed|ing"})[0,2]
+)
+
+
+/* E.g. his mother, her brothers - need to annotate these as a Person so that any following relative pronouns are matched correctly */
+Rule: MatchPossessiveRelationMale
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)((boy|boyfriend|brother|dad|ex-husband|father|father-in-law|fiancé|grandfather|grandson|half-brother|husband|ex-husband|nephew|son|step-father|step-son|stepfather|uncle|widower)(s)?)|(man|men)"}
+):p
+-->
+:p.${PERSON}={gender="male", role="family", sortal="true"}
+
+
+Rule: MatchPossessiveRelationFemale
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)((aunt|daughter|fiancée|girl|girlfriend|granddaughter|grandmother|mother|mum|mom|niece|sister|step-daughter|step-mother|stepmother|stepmum|widow)(s)?)|(ex-wife|ex-wives|lady|ladies|wife|wives|woman|women)"}
+):p
+-->
+:p.${PERSON}={gender="female", role="family", sortal="true"}
+
+
+Rule: MatchPossessiveRelationEither
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)((cousin|grandparent|infant|toddler|parent|partner|sibling|spouse|mistress|lover|mate|friend|neighbour|neighbor)(s)?)|(baby|babies|child|children|grandchild|grandchildren|great-grandchild|great-grandchildren|family|families)"}
+):p
+-->
+:p.${PERSON}={gender="either", role="family", sortal="true"}
+
+
+
+Rule: MatchPossessivePatientEither
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(patient|Patient|PATIENT|pt|Pt)(s)?"}
+):p
+-->
+:p.${PERSON}={gender="either", role="patient", sortal="true"}
+
+
+
+
+Rule: MatchPossessiveClinicalPersonEither
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	(
+		(
+			{Token.string ==~ "(?i)((consultant|dentist|pharmacist|dietician|nutritionist|anaesthetist|anesthetist|surgeon|doctor|nurse|optometrist|OT|pharmacist|physician|clinician|physio|physiotherapist|practitioner|provider|radiographer|resident|SLT|therapist)(s)?)|(midwife|midwives|staff)"}
+		) |
+		(
+			{Token.string ==~ "(?i)social|key"}
+			{Token.string ==~ "(?i)worker"}
+		) |
+		(
+			({Token.string ==~ "O|P"} | ( {Token.string ==~ "S"}{Token.string == "."}{Token.string == "L"}))
+			{Token.string == "."}
+			{Token.string ==~ "T"}
+			{Token.string == "."}
+		)
+	)
+):p
+-->
+:p.${PERSON}={gender="either", role="clinical", sortal="true"}
+
+
+
+Rule: MatchPossessiveClinicalPersonPluralEither
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)team(s)?"}
+):p
+-->
+:p.${PERSON}={gender="either", role="clinical", number="plural", sortal="true"}
+
+
+Rule: MatchPossessivePersonSuffixClinical
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string =~ "(?i)(edic|ologist|iatrist|iatrician|therapist|ontist|entist|omist|emist|scopist|icist|ometrist|oscopist|ographer)(s)?$"}
+):p
+-->
+:p.${PERSON}={gender="either", role="clinical", sortal="true"}
+
+
+
+Rule: MatchPersonClinicalTitle
+Priority: 10
+(
+	(
+		{${PERSON}, ${TITLE}@string ==~"Dr|Doctor|Dr\\."}
+	) |
+	(
+		{${PERSON}, ${PERSON}@string =~"\\sMD$"}
+	) |
+	(
+		{${PERSON}}
+		({Token.string == ","})?
+		{Token.string ==~ "(?i)M"}
+		({Token.string == "."})?
+		{Token.string ==~ "(?i)D"}
+		({Token.string == "."})?
+	)
+):p
+-->
+:p {
+	for (Annotation personAnn : pAnnots) {
+		personAnn.getFeatures().put("role", "clinical");
+		personAnn.getFeatures().put("sortal", "true");
+	}
+}
+
+
+Rule: MatchPossessiveJobPersonEither
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	(
+		{Token.string ==~ "(?i)(accountant|advocate|solicitor|lawyer|barrister|attorney|manager|supervisor|boss|client|defendant|plaintiff|claimant|neighbour|employee|worker|tenant|lodger|acquaintance|colleague|co-worker|coworker)(s)?"} |
+		{Token.string =~ "(?i)(ician)(s)?$"} |
+		{${JOBTITLE}}
+		// plus words ending with -[b-hj-np-tv-z]er, -tor, -sor longer than 4 letters. -gner, -ainer ?
+	)
+):p
+-->
+:p.${PERSON}={gender="either", role="work", sortal="true"}
+
+
+Rule: MatchSortalPluralPerson
+Priority: 10
+(
+	{Token.category == DT}
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)people|public|government|judiciary|police|army"}
+):p
+-->
+:p.${PERSON}={gender="either", role="work", number="plural", sortal="true"}
+
+
+
+Rule: MatchPossessiveLocation
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	({Token.string ==~ "(?i)(location|town|village|suburb|region|borough|place|street|building|cathedral|hospital|clinic|cinema|office|airport)(s)?"}):s
+):p
+-->
+:p.${LOCATION}={type=:s@cleanString, sortal="true"}
+
+
+Rule: MatchPossessiveLocation2
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	({Token.string ==~ "(?i)(cit(y|ies))|(count(y|ies))|(principalit(y|ies))|(librar(y|ies))|(church(es)?)"}):s
+):p
+-->
+:p.${LOCATION}={type=:s@cleanString, sortal="true"}
+
+
+Rule: MatchPossessiveOrganization
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	({Token.string ==~ "(?i)(corporation|group|establishment|enterprise|syndicate|organisation|organization|firm|partnership)(s)?"}):s
+):p
+-->
+:p.${ORGANIZATION}={type=:s@cleanString, sortal="true"}
+
+
+Rule: MatchPossessiveOrganization2
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	({Token.string ==~ "(?i)(compan(y|ies))|(business(es)?)"}):s
+):p
+-->
+:p.${ORGANIZATION}={type=:s@cleanString, sortal="true"}
+
+
+Rule: MatchPossessiveDisease
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)(abscess|chorea|coma|condition|constriction|defect|deformation|degeneration|disease|disorder|dysfunction|embolus|failure|fever|hernia|impairment|infarct|infarction|infection|inflammation|laceration|lesion|mass|obstruction|occlusion|poisoning|rupture|sickness|stricture|syndrome|trauma|ulcer|ulceration)(s)?"}
+):p
+-->
+:p.${DISEASE}={type="dsyn", sortal="true"}
+
+
+
+Rule: MatchPossessiveDisease2
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)(abnormalit(y|ies))|(allerg(y|ies))|(anomal(y|ies))|(deficienc(y|ies))|(deformit(y|ies))|(immunodeficienc(y|ies))|(injur(y|ies))|(insufficienc(y|ies))|(pals(y|ies))"}
+):p
+-->
+:p.${DISEASE}={type="dsyn", sortal="true"}
+
+
+
+Rule: MatchPossessiveProcedure
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)(agent|procedure|surgery|operation|treatment|transfusion|incision|excision|resection|medication|prescription|drug)(s)?"}
+):p
+-->
+:p.${PROCEDURE}={type="topp", sortal="true"}
+
+
+Rule: MatchPossessiveTest
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)test(s)?"}
+):p
+-->
+:p.${TEST}={type="diap"}
+
+
+Rule: MatchPossessiveSymptoms
+Priority: 10
+(
+	(POSSESSIVE)
+	(THREE_TOKEN_WINDOW)
+	{Token.string ==~ "(?i)(symptom|cough|spasm|pain|rash|fever|discomfort|bleed|bleeding)(s)?"}
+):p
+-->
+:p.${SYMPTOM}={type="sosy", sortal="true"}
+
+
+/* Generic things ... */
+/* This rule originally for clinical notes, where left|right, and words ending with -al often don't get correctly identified as adjectives */
+Rule: MatchPossessiveUnknownThing
+(
+	(POSSESSIVE)
+	({Token.category =~ "^JJ|RB"} | (GERUND_AS_ADJ) {Token.string =~ "(?i)al$"} | {Token.string ==~ "(?i)left|right"})[0,5]
+	({Token.category =~ "^NN", !${PERSON}, !${ORGANIZATION}, !${LOCATION}, !Day, !Date, !Time})[1,5]
+	(
+		{Token.string ==~ "(?i)of"}
+		{Token.category =~ "^NN", !${PERSON}, !${ORGANIZATION}, !${LOCATION}, !Day, !Date, !Time}
+	)?
+):p
+-->
+:p.${SORTAL}={sortal="true"}
+
+
+Rule: MatchPossessiveUnknownThingPP
+{Token.category ==~ "IN|CC"}
+(GERUND_AS_ADJ)?
+(
+	({Token.category =~ "^JJ|RB"} | {Token.string =~ "(?i)al$"} | {Token.string ==~ "(?i)left|right"})[0,5]
+	({Token.category =~ "^NN", !${PERSON}, !Day, !Date, !Time})[1,5]
+):p
+-->
+:p.${SORTAL}={sortal="true"}
+
+
+
+Rule: MatchSortalDate
+Priority: 10
+(
+	({Token.string ==~ "(?i)at|on|during|before|after"}):rel
+	{Token.string ==~ "(?i)this|that|which"}
+	{Token.string ==~ "(?i)date|time|period|day|morning|afternoon|evening"}
+):p
+-->
+:p.Date={sortal="true", rel=:rel.Token.string}
+
+
+Rule: MatchSortalTime
+Priority: 10
+(
+	({Token.string ==~ "(?i)at|during|before|after"}):rel
+	{Token.string ==~ "(?i)this|that|which"}
+	{Token.string ==~ "(?i)time|moment|instant|hour"}
+):p
+-->
+:p.Time={sortal="true", rel=:rel.Token.string}
+
+
+Rule: MatchSortalDay
+Priority: 10
+(
+	({Token.string ==~ "(?i)on|during|after|before"}):rel
+	{Token.string ==~ "(?i)this|that|which"}
+	{Token.string ==~ "(?i)day|morning|afternoon|evening"}
+):p
+-->
+:p.Day={sortal="true", rel=:rel.Token.string}
+

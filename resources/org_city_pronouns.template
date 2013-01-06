@@ -1,0 +1,698 @@
+/*
+*  
+* Filename: 		org_city_pronouns.jape
+* Author:			Phil Gooch
+* Copyright:		Phil Gooch
+* Description:		Annotates anaphoric pronouns prior to coreferencing in later phases.
+*					'It' pronouns previously annotated as pleonastic are excluded
+*				
+*
+* Date created:		08/09/2011
+* This version:		0.5
+* 
+* 
+* Change history
+* ==========================================================================
+* Date				Version		Author			Description
+* ==========================================================================
+* 15/09/2011		0.2			PG				Added annotation of here, there, where in pronoun context
+* 20/01/2012		0.3			PG				Improved distinction of it, this, that, these, those as subject/object
+*												Improved distinction of her possessive vs. her nominative.
+* 12/03/2012		0.4			PG				Distinguish pleonastic that in THIS_THAT macro
+* 04/04/2012		0.5			PG				Tidied up Token category regexes, distinguish definite descriptor 'this|that' from pronominal use.
+*												Create two annots for third person plural (one Person, one Thing) and add gender=either to the Person one.
+*/
+
+
+Phase:	Pronouns
+Input:  Token VG ${PRONOUN}
+Options: control = all
+
+
+MACRO: SINGULAR_FIRST_PERSON_NOMINATIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)I"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)I"}
+)
+
+
+MACRO: SINGULAR_FIRST_PERSON_OBJECTIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)me"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)me"}
+)
+
+MACRO: SINGULAR_FIRST_PERSON_REFLEXIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)myself"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)myself"}
+)
+
+MACRO: SINGULAR_FIRST_PERSON_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)my"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)my"}
+)
+
+MACRO: SINGULAR_FIRST_PERSON_NOMINATIVE_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)mine"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)mine"}
+)
+
+MACRO: PLURAL_FIRST_PERSON_NOMINATIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)we"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)we"}
+)
+
+
+MACRO: PLURAL_FIRST_PERSON_OBJECTIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)us"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)us"}
+)
+
+MACRO: PLURAL_FIRST_PERSON_REFLEXIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)ourselves"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)ourselves"}
+)
+
+MACRO: PLURAL_FIRST_PERSON_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)our"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)our"}
+)
+
+MACRO: PLURAL_FIRST_PERSON_NOMINATIVE_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)ours"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)ours"}
+)
+
+
+/* Can be nominative or objective, depending on context (can also be plural but we leave this for now ) */
+MACRO: SINGULAR_SECOND_PERSON_NOMINATIVE_OBJECTIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)you"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)you"}
+)
+
+
+MACRO: SINGULAR_SECOND_PERSON_REFLEXIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)yourself"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)yourself"}
+)
+
+
+/* Can also be plural, depending on context */ 
+MACRO: SINGULAR_SECOND_PERSON_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)your"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)your"}
+)
+
+
+MACRO: SINGULAR_SECOND_PERSON_NOMINATIVE_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)yours"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)yours"}
+)
+
+
+MACRO: PLURAL_SECOND_PERSON_REFLEXIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)yourselves"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)yourselves"}
+)
+
+
+MACRO: PLURAL_THIRD_PERSON_NOMINATIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)they"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)they"}
+)
+
+
+MACRO: PLURAL_THIRD_PERSON_OBJECTIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)them"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)them"}
+)
+
+
+MACRO: PLURAL_THIRD_PERSON_REFLEXIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)themselves"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)themselves"}
+)
+
+
+MACRO: PLURAL_THIRD_PERSON_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)their"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)their"}
+)
+
+
+MACRO: PLURAL_THIRD_PERSON_NOMINATIVE_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)theirs"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)theirs"}
+)
+
+
+MACRO: SINGULAR_MALE_PERSON_NOMINATIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)he"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)he"}
+)
+
+
+MACRO: SINGULAR_MALE_PERSON_OBJECTIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)him"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)him"}
+)
+
+
+MACRO: SINGULAR_MALE_PERSON_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)his"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)his"}
+)
+
+
+MACRO: SINGULAR_MALE_PERSON_REFLEXIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)himself"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)himself"}
+)
+
+
+
+MACRO: SINGULAR_FEMALE_PERSON_NOMINATIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)she"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)she"}
+)
+
+
+/* Can be objective or possessive, depending on context */
+MACRO: SINGULAR_FEMALE_PERSON_OBJECTIVE_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)her"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)her"}
+)
+
+
+MACRO: SINGULAR_FEMALE_PERSON_REFLEXIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)herself"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)herself"}
+)
+
+
+MACRO: SINGULAR_FEMALE_PERSON_NOMINATIVE_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)hers"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)hers"}
+)
+
+
+
+/* Can be nominative or objective, depending on context */
+MACRO: IT
+(
+	{Token.category == PRP, Token.string ==~ "(?i)it", !${PRONOUN}.type == pleonastic} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)it", !${PRONOUN}.type == pleonastic}
+)
+
+MACRO: IT_REFLEXIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)itself"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)itself"}
+)
+
+MACRO: IT_POSSESSIVE
+(
+	{Token.category == PRP, Token.string ==~ "(?i)its"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)its"}
+)
+
+
+MACRO: THIS_THAT
+(
+	{Token.category == DT, Token.string ==~ "(?i)this|that", !${PRONOUN}.type == pleonastic} |
+	{Token.category == PRP, Token.string ==~ "(?i)this|that", !${PRONOUN}.type == pleonastic} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)this|that", !${PRONOUN}.type == pleonastic}
+)
+
+MACRO: THESE_THOSE
+(
+	{Token.category == DT, Token.string ==~ "(?i)these|those"} |
+	{Token.category == PRP, Token.string ==~ "(?i)these|those"} |
+	{Token.category == "PRP$", Token.string ==~ "(?i)these|those"}
+)
+
+
+MACRO: RB
+(
+	{Token.category == RB} |
+	{Token.category == RBS} |
+	{Token.category == RBR}
+)
+
+
+
+/* I etc */
+Rule: MatchSingularFirstPersonNominative
+(
+	(SINGULAR_FIRST_PERSON_NOMINATIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="first", case="nominative", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchSingularFirstPersonObjective
+(
+	(SINGULAR_FIRST_PERSON_OBJECTIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="first", case="objective", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchSingularFirstPersonPossessive
+(
+	(SINGULAR_FIRST_PERSON_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="first", case="possessive", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchSingularFirstPersonNominativePossessive
+(
+	(SINGULAR_FIRST_PERSON_NOMINATIVE_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="first", case="nominative-possessive", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchSingularFirstPersonReflexive
+(
+	(SINGULAR_FIRST_PERSON_REFLEXIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="first", case="reflexive", gender="either", string=:prp@cleanString}
+
+
+/* we etc */
+Rule: MatchPluralFirstPersonNominative
+(
+	(PLURAL_FIRST_PERSON_NOMINATIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="first", case="nominative", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchPluralFirstPersonObjective
+(
+	(PLURAL_FIRST_PERSON_OBJECTIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="first", case="objective", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchPluralFirstPersonPossessive
+(
+	(PLURAL_FIRST_PERSON_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="first", case="possessive", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchPluralFirstPersonNominativePossessive
+(
+	(PLURAL_FIRST_PERSON_NOMINATIVE_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="first", case="nominative-possessive", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchPluralFirstPersonReflexive
+(
+	(PLURAL_FIRST_PERSON_REFLEXIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="first", case="reflexive", gender="either", string=:prp@cleanString}
+
+
+/* you etc */
+Rule: MatchSingularSecondPersonNominative
+(
+	(SINGULAR_SECOND_PERSON_NOMINATIVE_OBJECTIVE)
+):prp
+(RB)?
+{VG, !VG.tense == "Inf"}
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="second", case="nominative", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchSingularSecondPersonObjective
+(
+	(SINGULAR_SECOND_PERSON_NOMINATIVE_OBJECTIVE)
+):prp
+( {!VG, !Token.category =~ "^RB"} | {VG.tense == "Inf"})
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="second", case="objective", gender="either", string=:prp@cleanString}
+
+
+/* Text-speak 'u' for you */
+Rule: MatchSingularSecondPersonTxtNominative
+(
+	{Token.string ==~ "(?i)u"}
+):prp
+(RB)?
+{VG, !VG.tense == "Inf"}
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="second", case="nominative", gender="either", string="you"}
+
+
+Rule: MatchSingularSecondPersonTxtObjective
+(
+	{Token.category == "IN|TO"} |
+	{VG}
+)
+(
+	{Token.string ==~ "(?i)u"}
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="second", case="objective", gender="either", string="you"}
+
+
+
+Rule: MatchSingularSecondPersonPossessive
+(
+	(SINGULAR_SECOND_PERSON_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="second", case="possessive", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchSingularSecondPersonNominativePossessive
+(
+	(SINGULAR_SECOND_PERSON_NOMINATIVE_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="second", case="nominative-possessive", gender="either", string=:prp@cleanString}
+
+
+Rule: MatchSingularSecondPersonReflexive
+(
+	(SINGULAR_SECOND_PERSON_REFLEXIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="second", case="reflexive", gender="either", string=:prp@cleanString}
+
+
+
+Rule: MatchPluralSecondPersonReflexive
+(
+	(PLURAL_SECOND_PERSON_REFLEXIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="second", case="reflexive", gender="either", string=:prp@cleanString}
+
+
+
+/* they etc */
+Rule: MatchPluralThirdPersonNominative
+(
+	(PLURAL_THIRD_PERSON_NOMINATIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="third", case="nominative", gender="either", string=:prp@cleanString},
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Thing", person="third", case="nominative", string=:prp@cleanString}
+
+
+Rule: MatchPluralThirdPersonObjective
+(
+	(PLURAL_THIRD_PERSON_OBJECTIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="third", case="objective", gender="either", string=:prp@cleanString},
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Thing", person="third", case="objective", string=:prp@cleanString}
+
+
+Rule: MatchPluralThirdPersonPossessive
+(
+	(PLURAL_THIRD_PERSON_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="third", case="possessive", gender="either", string=:prp@cleanString},
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Thing", person="third", case="possessive", string=:prp@cleanString}
+
+
+Rule: MatchPluralThirdPersonNominativePossessive
+(
+	(PLURAL_THIRD_PERSON_NOMINATIVE_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="third", case="nominative-possessive", gender="either", string=:prp@cleanString},
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Thing", person="third", case="nominative-possessive", string=:prp@cleanString}
+
+
+Rule: MatchPluralThirdPersonReflexive
+(
+	(PLURAL_THIRD_PERSON_REFLEXIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Person", person="third", case="reflexive", gender="either", string=:prp@cleanString},
+:prp.${PRONOUN}={type="anaphoric", number="plural", cls="Thing", person="third", case="reflexive", string=:prp@cleanString}
+
+
+
+/* he etc */
+Rule: MatchSingularMaleThirdPersonNominative
+(
+	(SINGULAR_MALE_PERSON_NOMINATIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="nominative", gender="male", string=:prp@cleanString}
+
+
+Rule: MatchSingularMaleThirdPersonObjective
+(
+	(SINGULAR_MALE_PERSON_OBJECTIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="objective", gender="male", string=:prp@cleanString}
+
+
+Rule: MatchSingularMaleThirdPersonPossessive
+(
+	(SINGULAR_MALE_PERSON_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="possessive", gender="male", string=:prp@cleanString}
+
+
+
+Rule: MatchSingularMaleThirdPersonReflexive
+(
+	(SINGULAR_MALE_PERSON_REFLEXIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="reflexive", gender="male", string=:prp@cleanString}
+
+
+
+/* she etc */
+Rule: MatchSingularFemaleThirdPersonNominative
+(
+	(SINGULAR_FEMALE_PERSON_NOMINATIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="nominative", gender="female", string=:prp@cleanString}
+
+
+Rule: MatchSingularFemaleThirdPersonObjective
+(
+	(
+		(SINGULAR_FEMALE_PERSON_OBJECTIVE_POSSESSIVE)
+	):prp
+)
+(
+	(
+		{Token.kind == punctuation} |
+		{Token.category ==~ "IN|TO|DT|CC|PRP"} |
+		{Token.category == "PRP$"}
+	) |
+	(
+		{VG}
+		{VG, VG.tense == "Inf"}
+	) |
+	(
+		{VG}
+		{!VG}
+	)
+)
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="objective", gender="female", string=:prp@cleanString}
+
+
+Rule: MatchSingularFemaleThirdPersonPossessive
+(
+	(
+		(SINGULAR_FEMALE_PERSON_OBJECTIVE_POSSESSIVE)
+	):prp
+)
+(
+	(
+		{!VG, !Token.kind == punctuation,  !Token.category == TO, !Token.category == IN, !Token.category == DT, !Token.category == CC, !Token.category == PRP, !Token.category == "PRP$"}
+	)
+	|
+	(
+		{VG}
+		{VG, !VG.tense == "Inf"}
+	)
+)
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="possessive", gender="female", string=:prp@cleanString}
+
+
+Rule: MatchSingularFemaleThirdPersonNominativePossessive
+(
+	(SINGULAR_FEMALE_PERSON_NOMINATIVE_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="nominative-possessive", gender="female", string=:prp@cleanString}
+
+
+Rule: MatchSingularFemaleThirdPersonReflexive
+(
+	(SINGULAR_FEMALE_PERSON_REFLEXIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Person", person="third", case="reflexive", gender="female", string=:prp@cleanString}
+
+
+
+Rule: MatchTheseThoseNominative
+(
+	(THESE_THOSE)
+):prn 
+(RB)?
+{VG, !VG.tense == "Inf"}
+-->
+:prn.${PRONOUN}={type="anaphoric", number="plural", cls="Thing", person="third", case="nominative", string=:prn@cleanString}
+
+
+
+Rule: MatchTheseThoseObjective
+(
+	(THESE_THOSE)
+):prn 
+( {!VG, !Token.category =~ "^RB|JJ|NN"} | {VG.tense == "Inf"})
+-->
+:prn.${PRONOUN}={type="anaphoric", number="plural", cls="Thing", person="third", case="objective", string=:prn@cleanString}
+
+
+
+Rule: MatchItNominative
+(
+	(IT)  |
+	(THIS_THAT)
+):prn 
+(RB)?
+{VG, !VG.tense == "Inf"}
+-->
+:prn.${PRONOUN}={type="anaphoric", number="singular", cls="Thing", person="third", case="nominative", string=:prn@cleanString}
+
+
+Rule: MatchItObjective
+(
+	(IT)  |
+	(THIS_THAT)
+):prn 
+( {!VG, !Token.category =~ "^RB|JJ|NN"} | {VG.tense == "Inf"})
+-->
+:prn.${PRONOUN}={type="anaphoric", number="singular", cls="Thing", person="third", case="objective", string=:prn@cleanString}
+
+
+
+Rule: MatchItPossessive
+(
+	(IT_POSSESSIVE)
+):prp
+-->
+:prp.${PRONOUN}={type="anaphoric", number="singular", cls="Thing", case="possessive", person="third", string=:prp@cleanString}
+
+
+
+Rule: MatchWDTNominative
+(
+	{Token.category == WP, Token.string ==~ "(?i)who"} 
+):prn
+-->
+:prn.${RELATIVE_PRONOUN}={type="anaphoric", number="either", cls="Person", person="third", case="nominative-objective", gender="either", string=:prn@cleanString}
+
+
+Rule: MatchWDTPossessive
+(
+	{Token.category == "WP$", Token.string ==~ "(?i)whose"}
+):prn
+-->
+:prn.${RELATIVE_PRONOUN}={type="anaphoric", number="either", cls="Person", person="third", case="possessive", gender="either", string=:prn@cleanString}
+
+
+Rule: MatchWDTObjective
+(
+	{Token.category == WP, Token.string ==~ "(?i)whom"}
+):prn
+-->
+:prn.${RELATIVE_PRONOUN}={type="anaphoric", number="either", cls="Person", person="third", case="objective", gender="either", string=:prn@cleanString}
+
+
+
+Rule: MatchWDTClause
+(
+	(
+		{Token.category == WDT, Token.string ==~ "(?i)which"} |
+		{Token.category ==~ "WDT|IN", Token.string ==~ "(?i)that", !${PRONOUN}.type == pleonastic}
+	)
+):prn
+-->
+:prn.${RELATIVE_PRONOUN}={type="anaphoric", number="either", cls="Thing", person="third", case="nominative-objective", string=:prn@cleanString}
+
+
+
+/* London is the town where [he] grew up 
+Distinguish between this relative pronoun use of where as opposed to interrogative use.
+Coreference rules will be the same for which and that - i.e. only with directly preceding mention
+*/
+Rule: MatchWRBClause
+(
+	(
+		{Token.category == WRB, Token.string ==~ "(?i)where"} 
+	)
+):prn
+(
+	{Token.category ==~ "PRP|DT"} |
+	{Token.category == "PRP$"} |
+	{Token.category =~ "^NN"} 
+)
+-->
+:prn.${RELATIVE_PRONOUN}={type="anaphoric", number="either", cls="Location", person="third", case="nominative-objective",  string=:prn@cleanString}
+
+
+
+Rule: MatchHereThereObjective
+(
+	{Token.string ==~ "(?i)here|there"}
+):prn 
+({!VG} | {VG.tense == "Inf"})
+-->
+:prn.${PRONOUN}={type="anaphoric", number="singular", cls="Location", person="third", case="objective", string=:prn@cleanString}

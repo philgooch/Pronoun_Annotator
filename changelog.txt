@@ -1,0 +1,18 @@
+2012-04-05: v.0.52 - Enhancements to coreference in quoted text. Added corefSortalMentions parameter to determine whether sortal/definite descriptors should be coreferenced against the relevant pronoun.
+
+2012-04-04: v.0.51 - Further disambiguation and improvements to identification of definite descriptors and coreference of third person plural pronouns. Added configuration file to define base annotation types.
+
+2012-04-03: v.0.50 - Improvements to relative pronoun matching. Added further protagonist options for first and second person pronoun resolution, and third person pronouns in quoted text. Create new Person-type mentions for possessive-person relations, e.g. his brother, her son, his lawyer; create new Thing-type mentions for 'his operation' etc and sortal/definite descriptor references.
+
+2012-03-15: v.0.32 - Efficiency improvements, bug fixes and enhancements to pleonastic module. Added ability to set second person pronouns to the first named Person in the document.
+
+2012-03-15: v.0.31 - Improved matching of Persons without gender to nearest  grammatically agreeing personal pronoun, and then set the gender of the Person from thereon.
+
+2012-03-13: Version 0.3 - Simplified output and now performs pronominal coreference on user-defined annotations.
+
+2012-02-06: Generate temporary JAPE files from templates, which are deleted on exit.
+Improve identification of pronoun case.
+
+2012-01-20: Improved distinction of it, this, that, these, those as subject/object. Improved distinction of her possessive vs. her nominative.
+
+15/09/2011: Added annotation of here, there, where in pronoun context
