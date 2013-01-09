@@ -17,7 +17,6 @@ The plugin requires the following ANNIE components to be in your Corpus pipeline
 ANNIE Tokenizer
 ANNIE POS Tagger
 [or standard ANNIE application components plus the following]
-ANNIE VP Chunker
 GATE Morphological Analyzer
 [followed by Pronoun Annotator]
 

@@ -1,3 +1,5 @@
+2013-01-09: v.0.53 - No longer need ANNIE VP Chunker in pipeline, an enhanced VerbGroups.jape file is included and loaded by the PR
+
 2012-04-05: v.0.52 - Enhancements to coreference in quoted text. Added corefSortalMentions parameter to determine whether sortal/definite descriptors should be coreferenced against the relevant pronoun.
 
 2012-04-04: v.0.51 - Further disambiguation and improvements to identification of definite descriptors and coreference of third person plural pronouns. Added configuration file to define base annotation types.
