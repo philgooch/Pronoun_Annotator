@@ -36,9 +36,12 @@ MACRO: THREE_TOKEN_WINDOW
 
 MACRO: POSSESSIVE
 (
-	{${PRONOUN}.cls == "Person", ${PRONOUN}.case == "possessive"} |
-	( {${PERSON}} {Token.category == POS} ) |
-	{Token.category == DT}
+	({Token.category == "RB"})[0, 2]
+	(
+		({${PRONOUN}.cls == "Person", ${PRONOUN}.case == "possessive"} ({Token.category =~ "^NN"} {Token.category == POS})? ) |
+		( {${PERSON}} {Token.category == POS} ) |
+		{Token.category == DT}
+	)
 )
 
 MACRO: GERUND_AS_ADJ
@@ -102,7 +105,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	(
 		(
-			{Token.string ==~ "(?i)((consultant|dentist|pharmacist|dietician|nutritionist|anaesthetist|anesthetist|surgeon|doctor|nurse|optometrist|OT|pharmacist|physician|clinician|physio|physiotherapist|practitioner|provider|radiographer|resident|SLT|therapist)(s)?)|(midwife|midwives|staff)"}
+			{Token.string ==~ "(?i)((consultant|GP|dentist|pharmacist|dietician|nutritionist|anaesthetist|anesthetist|surgeon|doctor|nurse|optometrist|OT|pharmacist|physician|clinician|physio|physiotherapist|practitioner|provider|radiographer|resident|SLT|therapist)(s)?)|(midwife|midwives|staff)"}
 		) |
 		(
 			{Token.string ==~ "(?i)social|key"}
@@ -192,7 +195,7 @@ Priority: 10
 (
 	{Token.category == DT}
 	(THREE_TOKEN_WINDOW)
-	{Token.string ==~ "(?i)people|public|government|judiciary|police|army"}
+	{Token.string ==~ "(?i)people|public|government|judiciary|police|army|others"}
 ):p
 -->
 :p.${PERSON}={gender="either", role="work", number="plural", sortal="true"}
@@ -248,7 +251,7 @@ Priority: 10
 (
 	(POSSESSIVE)
 	(THREE_TOKEN_WINDOW)
-	{Token.string ==~ "(?i)(abscess|chorea|coma|condition|constriction|defect|deformation|degeneration|disease|disorder|dysfunction|embolus|failure|fever|hernia|impairment|infarct|infarction|infection|inflammation|laceration|lesion|mass|obstruction|occlusion|poisoning|rupture|sickness|stricture|syndrome|trauma|ulcer|ulceration)(s)?"}
+	{Token.string ==~ "(?i)(abscess|ailment|chorea|coma|condition|constriction|defect|deformation|degeneration|disease|disorder|dysfunction|embolus|failure|fever|hernia|illness|impairment|infarct|infarction|infection|inflammation|laceration|lesion|mass|obstruction|occlusion|poisoning|rupture|sickness|stricture|syndrome|trauma|ulcer|ulceration)(s)?"}
 ):p
 -->
 :p.${DISEASE}={type="dsyn", sortal="true"}
@@ -305,11 +308,11 @@ Priority: 10
 Rule: MatchPossessiveUnknownThing
 (
 	(POSSESSIVE)
-	({Token.category =~ "^JJ|RB"} | (GERUND_AS_ADJ) {Token.string =~ "(?i)al$"} | {Token.string ==~ "(?i)left|right"})[0,5]
-	({Token.category =~ "^NN", !${PERSON}, !${ORGANIZATION}, !${LOCATION}, !Day, !Date, !Time})[1,5]
+	({Token.category =~ "^JJ|RB"} | (GERUND_AS_ADJ) | {Token.string =~ "(?i)al$"} | {Token.string ==~ "(?i)left|right"})[0,5]
+	({Token.category =~ "^NN", Token.length > 2, !${PERSON}, !${ORGANIZATION}, !${LOCATION}, !Day, !Date, !Time})[1,5]
 	(
 		{Token.string ==~ "(?i)of"}
-		{Token.category =~ "^NN", !${PERSON}, !${ORGANIZATION}, !${LOCATION}, !Day, !Date, !Time}
+		{Token.category =~ "^NN", Token.length > 2, !${PERSON}, !${ORGANIZATION}, !${LOCATION}, !Day, !Date, !Time}
 	)?
 ):p
 -->
@@ -321,7 +324,7 @@ Rule: MatchPossessiveUnknownThingPP
 (GERUND_AS_ADJ)?
 (
 	({Token.category =~ "^JJ|RB"} | {Token.string =~ "(?i)al$"} | {Token.string ==~ "(?i)left|right"})[0,5]
-	({Token.category =~ "^NN", !${PERSON}, !Day, !Date, !Time})[1,5]
+	({Token.category =~ "^NN", Token.length > 2, !${PERSON}, !Day, !Date, !Time})[1,5]
 ):p
 -->
 :p.${SORTAL}={sortal="true"}

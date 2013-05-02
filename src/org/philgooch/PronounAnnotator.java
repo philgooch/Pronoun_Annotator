@@ -803,9 +803,15 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements
                     forceCaseMatch = false;
                 }
 
+				// For non-Person mentions, we really want to be in the same sentence or 1 sentence apart
+				// Person mentions tend to have a wider coreference scope (protagonist theory)
+				int sentenceDistance = 1;
+				if ( cls.equals("Person") ) {
+					sentenceDistance = maxSentenceDistance;
+				}
                 Annotation currSentence = currSentenceAS.iterator().next();
                 int currSentencePos = sentenceList.indexOf(currSentence);
-                int endSentencePos = currSentencePos + maxSentenceDistance;
+                int endSentencePos = currSentencePos + sentenceDistance;
                 if (currSentencePos >= numSentences - 1) {
                     endSentencePos = currSentencePos;
                 } else if (endSentencePos >= numSentences - 1) {
@@ -835,11 +841,11 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements
                 if (cls.equals("Person")) {
                     // Boolean isMostFrequentPerson = (Boolean)currFeats.remove("isMostFrequent");
                     // Do we want to coreference the first person mentioned with you, your pronouns?
-                    if (isFirstPerson != null
+                    if (isFirstPerson != null 
                             && (personPronoun2nd == Protagonist.FirstPersonMentioned || personPronoun1st == Protagonist.FirstPersonMentioned)) {
                         forceCaseMatch = true;
                     } // Do we want to coreference the most frequent person mentioned with with you, your, pronouns?
-                    else if (isMostFrequentPerson != null
+                    else if (isMostFrequentPerson != null 
                             && (personPronoun2nd == Protagonist.MostFrequentPersonMentioned || personPronoun1st == Protagonist.MostFrequentPersonMentioned)) {
                         forceCaseMatch = true;
                     }
@@ -878,7 +884,25 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements
                     String prCase = (String) pronounFeats.get("case");
                     String prGender = (String) pronounFeats.get("gender");
                     String prPerson = (String) pronounFeats.get("person");
+                    String prMatchPP = null;
+                    
+                    Set<String> tmpFs = new HashSet<String>();
+                    tmpFs.add(backrefIdFeature);
+                    AnnotationSet tmpAS = outputAS.get(prStart, prEnd).get(currType, tmpFs);
 
+					if (! tmpAS.isEmpty()) {
+						Annotation tmpAnn = tmpAS.iterator().next();
+						FeatureMap tmpFeats = tmpAnn.getFeatures();
+                    	// Don't reprocess first or second person pronouns that were linked on a previous pass
+                    	prMatchPP = (String)tmpFeats.get("matchPP");
+						if (prMatchPP != null) {
+							continue;
+						}
+					}
+					
+					// Might want to think about whether we want to force a case match for non-Person pronouns, maybe make it an option
+					caseMatch = prCase.contains(currCase);
+					
                     try {
                         // Primarily concerned with gender and case match for personal pronouns
                         if (cls.equals("Person")) {
