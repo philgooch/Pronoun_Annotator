@@ -295,9 +295,12 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements Progre
      * @param startPoint        Range start offset
      * @param endPoint          Range end offset
      */
-    private void populatePronounListInRange(AnnotationSet inputAS, List<Annotation> pronounsList, Long startOffset, Long endOffset, String cls) {
+    private void populatePronounListInRange(AnnotationSet inputAS, List<Annotation> pronounsList, Long startOffset, Long endOffset, String cls, String matchPP) {
         FeatureMap anaphorFilter = Factory.newFeatureMap();
         anaphorFilter.put("type", "anaphoric");
+        if (matchPP != null) {
+        	anaphorFilter.put("person", matchPP);
+        }
         anaphorFilter.put("cls", cls);
         AnnotationSet currSentencePronouns = inputAS.getContained(startOffset, endOffset).get(pronoun, anaphorFilter);
         AnnotationSet currSentenceRelativePronouns = inputAS.getContained(startOffset, endOffset).get(relativePronoun, anaphorFilter);
@@ -640,7 +643,9 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements Progre
         List<Annotation> sentenceList = new ArrayList<Annotation>(inputAS.get(sentenceName));
         int numSentences = sentenceList.size();
         Collections.sort(sentenceList, new OffsetComparator());
-
+		Annotation firstSentence = sentenceList.get(0);
+        Annotation lastSentence = sentenceList.get(numSentences - 1);
+        
         List<List<Annotation>> inputAnnsList = new ArrayList<List<Annotation>>();
 
         this.populateMentionList(inputAS, personTypes, inputAnnsList);
@@ -777,6 +782,7 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements Progre
                 Long currStart = curr.getStartNode().getOffset();
                 Long currEnd = curr.getEndNode().getOffset();
                 String currString = docContent.substring(currStart.intValue(), currEnd.intValue()).trim();
+                // Are we processing the last person and are we coreferencing first person pronouns against them?
                 if (cls.equals("Person") && personPronoun1st == Protagonist.LastPersonMentioned && curr.equals(lastPerson)) {
                     currStart = firstPerson.getStartNode().getOffset();
                     currEnd = firstPerson.getEndNode().getOffset();
@@ -803,15 +809,23 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements Progre
                     continue;
                 }
 
+				// Get the features of the current antecedent
                 FeatureMap currFeats = curr.getFeatures();
                 Integer backrefId = (Integer) currFeats.get(backrefIdFeature);
-
                 if (backrefId == null) {    // Not a cloned Person annotation from previous antecedent
                     this.setMentionPlurality(inputAS, curr);
                     this.setMentionCase(inputAS, curr);
                     forceCaseMatch = false;
                 }
-
+				String currCase = (String) currFeats.get("case");
+                String currNumber = (String) currFeats.get("number");
+                String currGender = (String) currFeats.get("gender");
+                String currPerson = (String) currFeats.get("person");
+                String matchPP = (String) currFeats.get("matchPP");
+                Boolean isFirstPerson = (Boolean) currFeats.get("isFirst");
+                Boolean isLastPerson = (Boolean) currFeats.get("isLast");
+                Boolean isMostFrequentPerson = (Boolean) currFeats.get("isMostFrequent");
+                
 				// For non-Person mentions, we really want to be in the same sentence or 1 sentence apart
 				// Person mentions tend to have a wider coreference scope (protagonist theory)
 				int sentenceDistance = 1;
@@ -827,6 +841,11 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements Progre
                     endSentencePos = numSentences - 1;
                 }
                 Annotation endSentence = sentenceList.get(endSentencePos);
+                
+                // Span the whole document if processing first person pronouns against the last person mentioned
+                if (isLastPerson != null) {
+                	endSentence = lastSentence;
+                }
                 Long currSentenceStart = currSentence.getStartNode().getOffset();
                 Long currSentenceEnd = currSentence.getEndNode().getOffset();
                 Long endSentenceStart = endSentence.getStartNode().getOffset();
@@ -834,16 +853,7 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements Progre
 
                 // Get all anaphors that appear after the antecedent within maxSentenceDistance and of the same class as the antecedent
                 List<Annotation> pronounsList = new ArrayList<Annotation>();
-                populatePronounListInRange(inputAS, pronounsList, currEnd, endSentenceEnd, cls);
-
-                String currCase = (String) currFeats.get("case");
-                String currNumber = (String) currFeats.get("number");
-                String currGender = (String) currFeats.get("gender");
-                String currPerson = (String) currFeats.get("person");
-                String matchPP = (String) currFeats.get("matchPP");
-                Boolean isFirstPerson = (Boolean) currFeats.get("isFirst");
-                Boolean isLastPerson = (Boolean) currFeats.get("isLast");
-                Boolean isMostFrequentPerson = (Boolean) currFeats.get("isMostFrequent");
+                populatePronounListInRange(inputAS, pronounsList, currEnd, endSentenceEnd, cls, matchPP);
 
                 // Check if we have potential gender ambiguity for coreference, i.e. more than one male or female to match
                 boolean genderCorefAmbiguity = false;
