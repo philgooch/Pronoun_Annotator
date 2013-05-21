@@ -794,7 +794,6 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements
                 }
 
                 FeatureMap currFeats = curr.getFeatures();
-                Integer currCorefId = (Integer) currFeats.get(corefIdFeature);
                 Integer backrefId = (Integer) currFeats.get(backrefIdFeature);
 
                 if (backrefId == null) {    // Not a cloned Person annotation from previous antecedent
