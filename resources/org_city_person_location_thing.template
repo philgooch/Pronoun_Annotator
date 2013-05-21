@@ -92,6 +92,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(patient|Patient|PATIENT|pt|Pt)(s)?"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PERSON}={gender="either", role="patient", sortal="true"}
 

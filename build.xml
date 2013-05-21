@@ -11,13 +11,13 @@
   <property name="plugin.name" value="PronounAnnotator"/>
 
   <!-- location of the top-level GATE installation directory -->
-  <property name="gate.home" location="../gate-6.2-SNAPSHOT-build4144-ALL" />
+  <property name="gate.home" location="/Users/phillipgooch/lib/gate" />
 
   <!-- location of GATE lib directory - should be inferred from gate.home -->
-  <property name="gate.lib" location="${gate.home}/lib" />
+  <property name="gate.lib" location="${gate.home}" />
   
   <!-- location of gate.jar - should be inferred from gate.home -->
-  <property name="gate.jar" location="${gate.home}/bin/gate.jar" />
+  <property name="gate.jar" location="${gate.home}/gate.jar" />
   
   <!-- Source directory - contains the Java source files for this plugin -->
   <property name="src.dir" location="src" />
