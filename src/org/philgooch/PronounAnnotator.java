@@ -13,6 +13,8 @@ import gate.Annotation;
 import gate.AnnotationSet;
 import gate.Factory;
 import gate.FeatureMap;
+import gate.event.ProgressListener;
+import gate.event.StatusListener;
 
 import java.util.*;
 import java.io.*;
@@ -27,7 +29,7 @@ import com.jenkov.*;
 @CreoleResource(name = "Pronoun Annotator",
 helpURL = "",
 comment = "Plugin that annotates pronouns according to anaphoricity/pleonasticity, number, case, gender")
-public class PronounAnnotator extends AbstractLanguageAnalyser implements
+public class PronounAnnotator extends AbstractLanguageAnalyser implements ProgressListener,
         ProcessingResource,
         Serializable {
 
@@ -632,7 +634,8 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements
 
         // Document content
         String docContent = document.getContent().toString();
-
+		int docLen = docContent.length();
+		
         // Sorted list of all sentences in document
         List<Annotation> sentenceList = new ArrayList<Annotation>(inputAS.get(sentenceName));
         int numSentences = sentenceList.size();
@@ -647,8 +650,15 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements
         // May wish to calculate last or first appearing person as the Protagonist
         //Annotation lastPerson = null;
         //Annotation firstPerson = null;
-
+		
+		fireStatusChanged("Performing pronominal coreference in " + document.getName());
+        fireProgressChanged(0);
+        int progress = 0;
+        
         for (int i = 0; i < inputAnnsList.size(); i++) {
+        	progress++;
+        	fireProgressChanged(progress / docLen);
+        	
             int anaphorId = -1;
 
             // inputAnns is a list of annotations of the same type (Person, Location, Other)
@@ -1056,6 +1066,17 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements
     public void cleanup() {
         Factory.deleteResource(japeTransducer);
     }
+    
+    @Override
+    public void progressChanged(int i) {
+        fireProgressChanged(i);
+    }
+
+    @Override
+    public void processFinished() {
+        fireProcessFinished();
+    }
+    
 
     @Optional
     @RunTime
