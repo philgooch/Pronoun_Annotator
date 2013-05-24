@@ -886,6 +886,10 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements Progre
                     boolean prInQuotedText = false;
                     boolean currInQuotedText = false;
 
+					if (isInterrupted()) {
+                    	throw new ExecutionException("Execution of pronominal coreference was interrupted.");
+                	}
+                
                     Annotation pronounAnn = itr.next();
                     Long prStart = pronounAnn.getStartNode().getOffset();
                     Long prEnd = pronounAnn.getEndNode().getOffset();
