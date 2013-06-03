@@ -58,6 +58,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)((boy|boyfriend|brother|dad|ex-husband|father|father-in-law|fiancé|grandfather|grandson|half-brother|husband|ex-husband|nephew|son|step-father|step-son|stepfather|uncle|widower)(s)?)|(man|men)"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PERSON}={gender="male", role="family", sortal="true"}
 
@@ -69,6 +70,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)((aunt|daughter|fiancée|girl|girlfriend|granddaughter|grandmother|mother|mum|mom|niece|sister|step-daughter|step-mother|stepmother|stepmum|widow)(s)?)|(ex-wife|ex-wives|lady|ladies|wife|wives|woman|women)"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PERSON}={gender="female", role="family", sortal="true"}
 
@@ -80,6 +82,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)((cousin|grandparent|infant|toddler|parent|partner|sibling|spouse|mistress|lover|mate|friend|neighbour|neighbor)(s)?)|(baby|babies|child|children|grandchild|grandchildren|great-grandchild|great-grandchildren|family|families)"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PERSON}={gender="either", role="family", sortal="true"}
 
@@ -132,6 +135,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)team(s)?"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PERSON}={gender="either", role="clinical", number="plural", sortal="true"}
 
@@ -143,6 +147,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string =~ "(?i)(edic|ologist|iatrist|iatrician|therapist|ontist|entist|omist|emist|scopist|icist|ometrist|oscopist|ographer)(s)?$"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PERSON}={gender="either", role="clinical", sortal="true"}
 
@@ -181,12 +186,13 @@ Priority: 10
 	(POSSESSIVE)
 	(THREE_TOKEN_WINDOW)
 	(
-		{Token.string ==~ "(?i)(accountant|advocate|solicitor|lawyer|barrister|attorney|manager|supervisor|boss|client|defendant|plaintiff|claimant|neighbour|employee|worker|tenant|lodger|acquaintance|colleague|co-worker|coworker)(s)?"} |
+		{Token.string ==~ "(?i)(mayor|sheriff|magistrate|judge|accountant|advocate|solicitor|lawyer|barrister|attorney|manager|supervisor|boss|client|defendant|plaintiff|claimant|neighbour|employee|worker|tenant|lodger|acquaintance|colleague|co-worker|coworker)(s)?"} |
 		{Token.string =~ "(?i)(ician)(s)?$"} |
 		{${JOBTITLE}}
-		// plus words ending with -[b-hj-np-tv-z]er, -tor, -sor longer than 4 letters. -gner, -ainer ?
+		// plus words ending with -[b-hj-np-tv-z]er, -tor, -sor, -yor longer than 4 letters. -gner, -ainer ?
 	)
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PERSON}={gender="either", role="work", sortal="true"}
 
@@ -198,6 +204,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)people|public|government|judiciary|police|army|others"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PERSON}={gender="either", role="work", number="plural", sortal="true"}
 
@@ -210,6 +217,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	({Token.string ==~ "(?i)(location|town|village|suburb|region|borough|place|street|building|cathedral|hospital|clinic|cinema|office|airport)(s)?"}):s
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${LOCATION}={type=:s@cleanString, sortal="true"}
 
@@ -221,6 +229,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	({Token.string ==~ "(?i)(cit(y|ies))|(count(y|ies))|(principalit(y|ies))|(librar(y|ies))|(church(es)?)"}):s
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${LOCATION}={type=:s@cleanString, sortal="true"}
 
@@ -232,6 +241,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	({Token.string ==~ "(?i)(corporation|group|establishment|enterprise|syndicate|organisation|organization|firm|partnership)(s)?"}):s
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${ORGANIZATION}={type=:s@cleanString, sortal="true"}
 
@@ -243,6 +253,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	({Token.string ==~ "(?i)(compan(y|ies))|(business(es)?)"}):s
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${ORGANIZATION}={type=:s@cleanString, sortal="true"}
 
@@ -254,6 +265,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)(abscess|ailment|chorea|coma|condition|constriction|defect|deformation|degeneration|disease|disorder|dysfunction|embolus|failure|fever|hernia|illness|impairment|infarct|infarction|infection|inflammation|laceration|lesion|mass|obstruction|occlusion|poisoning|rupture|sickness|stricture|syndrome|trauma|ulcer|ulceration)(s)?"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${DISEASE}={type="dsyn", sortal="true"}
 
@@ -266,6 +278,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)(abnormalit(y|ies))|(allerg(y|ies))|(anomal(y|ies))|(deficienc(y|ies))|(deformit(y|ies))|(immunodeficienc(y|ies))|(injur(y|ies))|(insufficienc(y|ies))|(pals(y|ies))"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${DISEASE}={type="dsyn", sortal="true"}
 
@@ -278,6 +291,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)(agent|procedure|surgery|operation|treatment|transfusion|incision|excision|resection|medication|prescription|drug)(s)?"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${PROCEDURE}={type="topp", sortal="true"}
 
@@ -289,6 +303,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)test(s)?"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${TEST}={type="diap"}
 
@@ -300,6 +315,7 @@ Priority: 10
 	(THREE_TOKEN_WINDOW)
 	{Token.string ==~ "(?i)(symptom|cough|spasm|pain|rash|fever|discomfort|bleed|bleeding)(s)?"}
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${SYMPTOM}={type="sosy", sortal="true"}
 
@@ -316,6 +332,7 @@ Rule: MatchPossessiveUnknownThing
 		{Token.category =~ "^NN", Token.length > 2, !${PERSON}, !${ORGANIZATION}, !${LOCATION}, !Day, !Date, !Time}
 	)?
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${SORTAL}={sortal="true"}
 
@@ -327,6 +344,7 @@ Rule: MatchPossessiveUnknownThingPP
 	({Token.category =~ "^JJ|RB"} | {Token.string =~ "(?i)al$"} | {Token.string ==~ "(?i)left|right"})[0,5]
 	({Token.category =~ "^NN", Token.length > 2, !${PERSON}, !Day, !Date, !Time})[1,5]
 ):p
+({!Token.category =~ "^NN", !Token.kind == word})
 -->
 :p.${SORTAL}={sortal="true"}
 

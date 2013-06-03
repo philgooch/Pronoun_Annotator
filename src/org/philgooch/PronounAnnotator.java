@@ -1040,6 +1040,8 @@ public class PronounAnnotator extends AbstractLanguageAnalyser implements Progre
                             // Inherit the pronoun's gender if the antecedent had no gender or ambiguous gender
                             if ((currGender == null || currGender.equals("either")) && prGender != null && !prGender.equals("either")) {
                                 feats.put("gender", prGender);
+                                // tentatively set the gender on the antecedent
+                                currFeats.put("gender", prGender);
                             }
                             // inherit pronoun's person if not null
                             if (prPerson != null) {
